@@ -1,0 +1,38 @@
+{
+ "N": 15,
+ "shots": 4096,
+ "backend": "qiskit-aer AerSimulator",
+ "qiskit": "2.5.2",
+ "per_base": {
+  "2": {
+   "true_order": 4,
+   "success_rate": 0.513916015625,
+   "shots": 4096
+  },
+  "4": {
+   "true_order": 2,
+   "success_rate": 0.500732421875,
+   "shots": 4096
+  },
+  "7": {
+   "true_order": 4,
+   "success_rate": 0.49951171875,
+   "shots": 4096
+  },
+  "8": {
+   "true_order": 4,
+   "success_rate": 0.512451171875,
+   "shots": 4096
+  },
+  "11": {
+   "true_order": 2,
+   "success_rate": 0.48681640625,
+   "shots": 4096
+  },
+  "13": {
+   "true_order": 4,
+   "success_rate": 0.497802734375,
+   "shots": 4096
+  }
+ }
+}

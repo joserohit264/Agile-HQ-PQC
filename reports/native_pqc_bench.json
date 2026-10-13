@@ -1,0 +1,92 @@
+{
+ "liboqs": "0.16.0",
+ "n": 300,
+ "kem": {
+  "ML-KEM-512": {
+   "pk": 800,
+   "ct": 768,
+   "keygen": {
+    "median_ms": 0.0147,
+    "p95_ms": 0.0254
+   },
+   "encaps": {
+    "median_ms": 0.0107,
+    "p95_ms": 0.0185
+   },
+   "decaps": {
+    "median_ms": 0.0104,
+    "p95_ms": 0.0158
+   }
+  },
+  "ML-KEM-768": {
+   "pk": 1184,
+   "ct": 1088,
+   "keygen": {
+    "median_ms": 0.0184,
+    "p95_ms": 0.0337
+   },
+   "encaps": {
+    "median_ms": 0.0136,
+    "p95_ms": 0.0203
+   },
+   "decaps": {
+    "median_ms": 0.0153,
+    "p95_ms": 0.0555
+   }
+  },
+  "ML-KEM-1024": {
+   "pk": 1568,
+   "ct": 1568,
+   "keygen": {
+    "median_ms": 0.0232,
+    "p95_ms": 0.0678
+   },
+   "encaps": {
+    "median_ms": 0.0167,
+    "p95_ms": 0.0442
+   },
+   "decaps": {
+    "median_ms": 0.019,
+    "p95_ms": 0.0689
+   }
+  }
+ },
+ "sig": {
+  "ML-DSA-44": {
+   "pk": 1312,
+   "sig": 2420,
+   "sign": {
+    "median_ms": 0.0613,
+    "p95_ms": 0.149
+   },
+   "verify": {
+    "median_ms": 0.0214,
+    "p95_ms": 0.0326
+   }
+  },
+  "ML-DSA-65": {
+   "pk": 1952,
+   "sig": 3309,
+   "sign": {
+    "median_ms": 0.0872,
+    "p95_ms": 0.2506
+   },
+   "verify": {
+    "median_ms": 0.0321,
+    "p95_ms": 0.0547
+   }
+  },
+  "ML-DSA-87": {
+   "pk": 2592,
+   "sig": 4627,
+   "sign": {
+    "median_ms": 0.1077,
+    "p95_ms": 0.2618
+   },
+   "verify": {
+    "median_ms": 0.0501,
+    "p95_ms": 0.0778
+   }
+  }
+ }
+}
