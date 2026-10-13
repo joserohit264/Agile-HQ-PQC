@@ -1,0 +1,13 @@
+flask>=3.0
+flask-socketio>=5.3
+simple-websocket>=1.0
+cryptography>=42
+PyJWT>=2.8
+numpy>=1.26
+psutil>=5.9
+kyber-py>=1.0
+dilithium-py>=1.0
+# evaluation / tests
+scipy>=1.11
+matplotlib>=3.8
+pytest>=8

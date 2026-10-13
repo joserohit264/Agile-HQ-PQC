@@ -1,0 +1,15 @@
+# Add-on requirements for the tier security suite and the Shor / resource-estimate notebook.
+# Install on top of the project's own requirements.txt:   pip install -r requirements-security.txt
+pytest>=8
+hypothesis>=6.100
+# notebook (Part A and B)
+qiskit>=1.2
+qiskit-aer>=0.15
+numpy>=1.26
+matplotlib>=3.8
+nbformat>=5.9
+nbconvert>=7.16
+ipykernel>=6.29
+# OPTIONAL - cross-implementation tests against liboqs (they are skipped automatically if absent).
+# Needs the liboqs C library; the project's testbed/ folder already uses it. See the setup prompt.
+# liboqs-python>=0.14

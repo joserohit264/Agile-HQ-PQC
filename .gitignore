@@ -1,0 +1,10 @@
+node_modules/
+__pycache__/
+.venv/
+data/
+*.pyc
+.pytest_cache/
+.hypothesis/
+*.orig
+*.zip
+.env
