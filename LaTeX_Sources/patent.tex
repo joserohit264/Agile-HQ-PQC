@@ -1,0 +1,76 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,enumitem,setspace}
+\setstretch{1.15}
+\title{\textbf{SYSTEM AND METHOD FOR ADAPTIVE QUANTUM-SAFE SECURITY AND PRIVACY FOR HEALTHCARE DATA}\\[4pt]\large (CADA-AASM) --- DRAFT PATENT SPECIFICATION}
+\author{Inventor: Jose Rohit M\\ Guide: Dr.\ Karthikeyan Jayaraman\\ School of Computer Science Engineering and Information Systems (SCORE), VIT Vellore, India}
+\date{October 2026}
+\begin{document}
+\maketitle
+\noindent\textit{Draft for discussion with a registered patent agent. It is not legal advice. A limited literature survey (18 IEEE Xplore papers from 2023 to 2026, read in full by one reviewer, plus seven non-IEEE works; see \texttt{docs/LITERATURE\_REVIEW.md} and \texttt{docs/REFERENCES.md}) was performed and is reflected in Section~2.1, but \emph{no formal patent prior-art search has been performed}; every statement of novelty is the inventor's position and must be verified by a registered patent agent before filing.}
+
+\section*{1. Field of the Invention}
+The invention relates to information security for networked medical devices and health-record systems, and in particular to a controller that jointly selects the strength of a hybrid post-quantum transport-cryptography suite and the strength of data-privacy mechanisms (differential privacy and $(K,L)$-anonymisation) as a function of a measured real-time latency budget, subject to a minimum protection tier for raw clinical data.
+
+\section*{2. Background}
+Post-quantum primitives standardised by NIST (ML-KEM, ML-DSA) have public keys, ciphertexts and signatures one to two orders of magnitude larger than X25519/Ed25519 equivalents; for example an ML-DSA-87 signature is 4\,627 bytes against 64 bytes for Ed25519, and spans several Ethernet frames. Streaming Internet-of-Medical-Things (IoMT) telemetry such as ICU electrocardiography is subject to an end-to-end latency service-level agreement (SLA) of about 200\,ms. A statically configured high-security suite can therefore violate the SLA under congestion. Separately, data released for secondary use must be de-identified, using differential privacy for numeric streams and $(K,L)$-anonymisation for tabular records, and these mechanisms also consume time and affect utility. In the inventor's review, transport cryptography and data-privacy mechanisms are configured independently of one another and of live latency conditions (but see Section~2.1).
+
+\subsection*{2.1 Known approaches (limited survey; reference numbers follow docs/REFERENCES.md)}
+Runtime selection of post-quantum parameters is \emph{known}. Rule-based tuning of Kyber and Saber parameter sets from processor and memory load on a constrained device is described by Sinaga et al.\ (ICCIT 2025, doi 10.1109/ICCIT65724.2025.11166918) [6]; it has no network input and no privacy dimension. Real-time cryptographic agility for autonomous UAV swarms is described by Aydeger and Carvalho (IEEE CCNC 2026, doi 10.1109/CCNC65079.2026.11366545) [10]; its security floors are soft and may be dropped under load. Outside IEEE Xplore, a TLS~1.3 client selects among hybrid ML-KEM groups from a measured round-trip time and device limits (AdaptiveQKE, 2025, not peer-reviewed) [25]; a context-aware optimiser selects post-quantum configurations for 6G vehicular links from predicted channel state (CAAP, arXiv:2602.01342) [26]; and an IoMT aggregation framework uses Q-learning for key management (Q-PRADAX, Sci.\ Rep.\ 15:37176, 2025) [24].
+
+Adaptive or data-driven setting of a differential-privacy budget is also \emph{known}: from gradient components in medical federated learning (Yu et al., IEEE BIBM 2024, doi 10.1109/BIBM62325.2024.10822141) [18]; once per dataset from Shapley value and entropy for synthetic medical data (Lyu et al., Edge-DPSDG, IEEE Trans.\ Big Data, vol.~11, no.~1, 2025) [20]; through a dynamic budget framework with R\'enyi accounting for medical federated learning (Birajdar et al., ICAAIC 2025, doi 10.1109/ICAAIC64647.2025.11330959) [21], which is theory only and reports no experiments; and from channel and resource conditions in mobile edge crowdsensing (ALPINE, arXiv:2510.17162) [27]. These react to training or data, not to network latency, and none sets the transport cipher.
+
+In the works read, none couples a post-quantum transport suite and data-privacy parameters (differential privacy and $(K,L)$-anonymisation) through a single latency budget, and none applies a hard minimum protection floor to raw clinical data while adapting a de-identified stream. \textbf{Consequently the inventive concept should not be framed as ``adaptive PQC selection'' or ``adaptive privacy budgets'' per se; it resides in the joint coupling of transport and privacy parameters under one budget, together with the dual-domain floor.} Dependent claims on the persistence filter, make-before-break re-keying and batch post-quantum signing are individually weak and are best treated as supporting embodiments.
+
+\section*{3. Summary}
+A gateway measures a round-trip time and a processor utilisation, computes a latency budget as the service-level latency minus the round-trip time minus a fraction of the utilisation, and maps the budget through a steering matrix to one of a plurality of tiers. Each tier \emph{simultaneously} fixes (a) a key-encapsulation parameter set, (b) a signature parameter set, (c) a symmetric AEAD cipher, (d) a differential-privacy parameter $\varepsilon$, and (e) anonymisation parameters $K$ and $L$. A persistence filter commits a tier change only after the same different target tier is produced on a predetermined number of consecutive measurement cycles. A domain-policy layer applies the selected tier unchanged to a de-identified-data stream but clamps the tier applied to a raw-protected-health-information stream to be no lower than a predetermined floor tier.
+
+\section*{4. Brief Description of the Drawings}
+FIG.~1 control loop; FIG.~2 steering matrix and hysteresis state machine; FIG.~3 hybrid handshake; FIG.~4 packet format with per-packet classical signature and per-epoch post-quantum signature; FIG.~5 dual-domain policy; FIG.~6 operator console. (Drawings to be prepared by the patent draftsman from \texttt{docs/ARCHITECTURE.md}.)
+
+\section*{5. Detailed Description}
+\subsection*{5.1 Measurement and budget}
+A prober measures round-trip time $R$ (ms) over a socket to a peer and processor utilisation $C$ (percent). The latency budget is $L=S-R-\alpha C$ with $S=200$\,ms and $\alpha=0.5$ in the preferred embodiment. In an alternative embodiment $R$ and $C$ are smoothed by an exponentially weighted moving average before use.
+
+\subsection*{5.2 Steering matrix}
+In the preferred embodiment: $L>80$\,ms selects Tier~5 (ML-KEM-1024, ML-DSA-87, AES-256-GCM, $\varepsilon=0.1$, $K=5$, $L_{div}=3$); $40<L\le80$ selects Tier~3 (ML-KEM-768, ML-DSA-65, AES-256-GCM, $\varepsilon=0.5$, $K=3$, $L_{div}=2$); $L\le 40$ selects Tier~1 (ML-KEM-512, ML-DSA-44, ChaCha20-Poly1305, $\varepsilon=1.0$, $K=2$, $L_{div}=2$). The thresholds and parameter sets are exemplary.
+
+\subsection*{5.3 Persistence filter}
+The controller stores a pending tier and a counter. When the target equals the active tier the counter is cleared. When the target differs it is compared with the pending tier: if equal the counter is incremented, otherwise the pending tier is replaced and the counter set to one. When the counter reaches $N$ (three in the preferred embodiment) the active tier is replaced and the counter cleared.
+
+\subsection*{5.4 Hybrid key establishment}
+Client and server perform an X25519 exchange and an ML-KEM encapsulation of the selected parameter set. The server signs the handshake transcript with both an Ed25519 and an ML-DSA key of the selected parameter set; the client accepts only if both verify. The master secret is derived by HKDF-SHA256 over the concatenation of the two shared secrets, salted with a hash of the transcript (an XOR combiner is an alternative embodiment).
+
+\subsection*{5.5 Make-before-break re-keying}
+Upon a tier change the handshake of the new tier is executed on a control path while data continues on the existing session; the data path switches on completion.
+
+\subsection*{5.6 Packet authentication}
+Each packet carries an AEAD-protected payload whose associated data include a tier identifier, session identifier and sequence number, and a classical signature. A post-quantum signature is computed over a chained hash of all packets of an epoch of $E$ packets and attached to the epoch-closing packet, amortising the post-quantum signature size; $E=1$ is a degenerate embodiment.
+
+\subsection*{5.7 Dual-domain policy}
+The tier $T_a$ selected by the controller is applied to the de-identified stream, where it also sets $\varepsilon$ of a Laplace mechanism with sensitivity-scaled noise and the parameters $(K,L_{div})$ of a Mondrian multidimensional partitioning anonymiser. The tier applied to the raw stream is $T_c=\max(T_a,T_{floor})$ with $T_{floor}=3$ in the preferred embodiment. A researcher-export function enforces $K\ge5$ and $L_{div}\ge3$ irrespective of $T_a$ and verifies the released table independently before release.
+
+\subsection*{5.8 Auditing}
+Control events are appended to a log in which each entry contains the hash of the previous entry and a keyed message-authentication code.
+
+\section*{6. Claims (draft)}
+\begin{enumerate}[leftmargin=*,label=\textbf{\arabic*.}]
+\item A computer-implemented method comprising: (a) measuring a round-trip time and a processor utilisation of a gateway handling medical telemetry; (b) computing a latency budget from a service-level latency, the round-trip time and a fraction of the processor utilisation; (c) selecting, from a plurality of tiers according to the latency budget, a tier that defines jointly a post-quantum key-encapsulation parameter set, a post-quantum signature parameter set, a symmetric cipher, a differential-privacy parameter and at least one anonymisation parameter; and (d) applying the selected tier to transport protection of a data stream and to de-identification of data derived from the stream.
+\item The method of claim 1, wherein a change of the selected tier is committed only after the same new tier is selected on a predetermined number of consecutive measurement cycles.
+\item The method of claim 1, wherein tiers differ in at least a ciphertext size of the key-encapsulation parameter set and a signature size of the signature parameter set, and a lower latency budget selects a tier with smaller sizes.
+\item The method of claim 1, further comprising applying to a stream of raw protected health information a tier not lower than a predetermined floor tier irrespective of the latency budget, while applying the selected tier without such a floor to a de-identified stream.
+\item The method of claim 1, wherein the key establishment combines a classical and a post-quantum shared secret by a key-derivation function and the handshake transcript is signed by both a classical and a post-quantum signature scheme, both of which must verify.
+\item The method of claim 1, wherein upon a change of tier a handshake for the new tier is executed while data continues on the previous session.
+\item The method of claim 1, wherein each packet carries a classical signature and a post-quantum signature is computed over a chained digest of a plurality of packets and carried on a single packet of the plurality.
+\item The method of claim 1, wherein the anonymisation parameter comprises $K$ and $L_{div}$ of a multidimensional partitioning anonymiser and the differential-privacy parameter is the privacy-loss parameter of a Laplace mechanism applied to a continuous physiological signal, the parameters increasing in strength with the latency budget.
+\item The method of claim 4, wherein an export to a research user enforces a minimum $K$ and $L_{div}$ independent of the selected tier and is refused if an independent verification of the released table fails.
+\item The method of claim 1, wherein control events are recorded in a hash-chained log with a keyed message-authentication code per entry.
+\item A system comprising a processor and memory storing instructions that, when executed, perform the method of any of claims 1--10.
+\item A non-transitory computer-readable medium storing instructions that, when executed, perform the method of any of claims 1--10.
+\end{enumerate}
+
+\noindent\textit{Drafting note for the patent agent:} consider adding to claim 1 the dual-domain floor of claim 4 as a fall-back independent claim, since the joint coupling alone may be argued to be an obvious combination of the known adaptive-PQC and adaptive-privacy approaches of Section~2.1.
+
+\section*{7. Abstract}
+A gateway for medical telemetry measures round-trip time and processor load, derives a latency budget, and selects a tier that jointly sets a hybrid post-quantum cipher suite, a differential-privacy parameter and anonymisation parameters, damped by a persistence filter and subject to a minimum tier for raw clinical data.
+\end{document}
